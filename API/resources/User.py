@@ -1,9 +1,14 @@
 from flask_restful import Resource
 from flask import jsonify,json
 from flask import flash, request
-from models import db, User, UserSchema
+from models import db, User, UserSchema,RevokedToken
 import bcrypt
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
+
+try:
+    from flask import _app_ctx_stack as ctx_stack
+except ImportError:  
+    from flask import _request_ctx_stack as ctx_stack
 
 users_schema = UserSchema(many=True)
 user_schema = UserSchema()
@@ -65,3 +70,18 @@ class Login(Resource):
                     },200
             else:
                 return {'message': 'Wrong credentials'}, 401
+
+class UserLogoutAccess(Resource):
+    @jwt_required
+    def post(self):
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedToken(jti = jti)
+            revoked_token.add()
+            return {'message': 'logged out successfully'}
+        except:
+            return {'message': 'Something went wrong'}, 500
+
+
+def get_raw_jwt():
+    return getattr(ctx_stack.top, 'jwt', {})
