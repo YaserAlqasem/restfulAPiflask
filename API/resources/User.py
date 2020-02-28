@@ -103,4 +103,15 @@ class TokenRefresh(Resource):
         current_user = get_jwt_identity()
         # return a non-fresh token for the user
         new_token = create_access_token(identity=current_user, fresh=False)
-        return {'access_token': new_token}, 200    
+        return {'access_token': new_token}, 200
+
+
+class UsersList(Resource):
+    @jwt_required
+    def get(self):
+        users = User.query.all()
+        users = users_schema.dump(users).data
+        if users:
+            return {'status': 'success', 'data': users}, 200
+        else:
+            return {'message': 'There is no Users found'}, 404
