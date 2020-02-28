@@ -115,3 +115,13 @@ class UsersList(Resource):
             return {'status': 'success', 'data': users}, 200
         else:
             return {'message': 'There is no Users found'}, 404
+
+class UserById(Resource):
+    @jwt_required
+    def get(self,userid):
+        user = User.query.filter_by(id = userid).one_or_none()
+        user = user_schema.dump(user).data
+        if user is not None:
+            return {'status': 'success', 'data': user}, 200
+        else:
+            return {'message': 'User not found'}, 404
