@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, pre_load, validate
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
-import datetime
+import datetime,bcrypt
 ma = Marshmallow()
 db = SQLAlchemy()
 
@@ -16,7 +16,7 @@ class User(db.Model):
     def __init__(self, Username, Email,Password):
         self.Username = Username
         self.Email = Email
-        self.Password = Password
+        self.Password = bcrypt.hashpw(Password.encode('utf8'), bcrypt.gensalt(12)).decode('utf-8')
         self.Registered_on = datetime.datetime.now()
         
 class UserSchema(ma.Schema):
