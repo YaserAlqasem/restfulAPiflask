@@ -82,6 +82,16 @@ class UserLogoutAccess(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
+class UserLogoutRefresh(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedToken(jti = jti)
+            revoked_token.add()
+            return {'message': 'logged out successfully'}
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 def get_raw_jwt():
     return getattr(ctx_stack.top, 'jwt', {})
