@@ -95,3 +95,12 @@ class UserLogoutRefresh(Resource):
 
 def get_raw_jwt():
     return getattr(ctx_stack.top, 'jwt', {})
+
+class TokenRefresh(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        # retrive the user's identity from the refresh token using a Flask-JWT-Extended built-in method
+        current_user = get_jwt_identity()
+        # return a non-fresh token for the user
+        new_token = create_access_token(identity=current_user, fresh=False)
+        return {'access_token': new_token}, 200    
