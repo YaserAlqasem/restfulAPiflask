@@ -1,11 +1,11 @@
 from flask import Flask
-
+from flask_jwt_extended import JWTManager
 
 def create_app(config_filename):
     app = Flask(__name__)
+    app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
     app.config.from_object(config_filename)
-
-
+    jwt = JWTManager(app)
 
     from app import api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
